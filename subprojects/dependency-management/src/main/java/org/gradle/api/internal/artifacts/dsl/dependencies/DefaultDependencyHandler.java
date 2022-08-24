@@ -85,6 +85,7 @@ public abstract class DefaultDependencyHandler implements DependencyHandler, Met
     private final ObjectFactory objects;
     private final PlatformSupport platformSupport;
     private final DynamicAddDependencyMethods dynamicMethods;
+    private Object owner;
 
     public DefaultDependencyHandler(ConfigurationContainer configurationContainer,
                                     DependencyFactory dependencyFactory,
@@ -112,6 +113,19 @@ public abstract class DefaultDependencyHandler implements DependencyHandler, Met
         this.platformSupport = platformSupport;
         configureSchema();
         dynamicMethods = new DynamicAddDependencyMethods(configurationContainer, new DirectDependencyAdder());
+    }
+
+    @Override
+    public Object owner() {
+        return owner;
+    }
+
+    @Override
+    public void initOwner(Object owner) {
+        if (this.owner != null) {
+            throw new IllegalStateException("Owner already set");
+        }
+        this.owner = owner;
     }
 
     @Override

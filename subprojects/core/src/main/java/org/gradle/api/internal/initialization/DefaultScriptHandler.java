@@ -128,6 +128,7 @@ public class DefaultScriptHandler implements ScriptHandler, ScriptHandlerInterna
         }
         if (dependencyHandler == null) {
             dependencyHandler = dependencyResolutionServices.getDependencyHandler();
+            dependencyHandler.initOwner(this);
         }
         if (classpathConfiguration == null) {
             classpathConfiguration = configContainer.create(CLASSPATH_CONFIGURATION);

@@ -51,6 +51,13 @@ abstract class DependencyHandlerDelegate : DependencyHandler {
     override fun getExtensions(): ExtensionContainer =
         delegate.extensions
 
+    override fun owner(): Any =
+        delegate.extensions
+
+    override fun initOwner(owner: Any) {
+        delegate.initOwner(owner)
+    }
+
     override fun add(configurationName: String, dependencyNotation: Any): Dependency? =
         delegate.add(configurationName, dependencyNotation)
 

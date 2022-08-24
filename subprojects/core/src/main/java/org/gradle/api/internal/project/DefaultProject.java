@@ -1024,6 +1024,7 @@ public abstract class DefaultProject extends AbstractPluginAware implements Proj
     public DependencyHandler getDependencies() {
         if (dependencyHandler == null) {
             dependencyHandler = services.get(DependencyHandler.class);
+            dependencyHandler.initOwner(this);
         }
         return dependencyHandler;
     }

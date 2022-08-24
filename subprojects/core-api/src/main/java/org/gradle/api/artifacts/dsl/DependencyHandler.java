@@ -269,6 +269,24 @@ import java.util.Map;
  */
 public interface DependencyHandler extends ExtensionAware {
     /**
+     * Returns the object that this dependency handler is attached to.
+     *
+     * @author chachako
+     */
+    default Object owner() {
+        return null;
+    }
+
+    /**
+     * Initializes the object that this dependency handler is attached to.
+     *
+     * @author chachako
+     */
+    default void initOwner(Object owner) {
+        // No-op
+    }
+
+    /**
      * Adds a dependency to the given configuration.
      *
      * @param configurationName The name of the configuration.
