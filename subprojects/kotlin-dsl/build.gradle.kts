@@ -119,6 +119,7 @@ dependencies {
 
 classycle {
     excludePatterns.add("org/gradle/kotlin/dsl/**")
+    excludePatterns.add("com/meowool/sweekt/gradle/**")
 }
 
 testFilesCleanup.reportOnly.set(true)

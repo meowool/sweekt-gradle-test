@@ -44,7 +44,10 @@ public class DefaultGradleApiSpecProvider extends GradleApiSpecProvider.SpecAdap
             "org.apache.commons.logging",
             "org.apache.log4j",
             "javax.annotation",
-            "javax.inject");
+            "javax.inject",
+
+            // Sweekt
+            "com.meowool.sweekt");
     }
 
     @Override
