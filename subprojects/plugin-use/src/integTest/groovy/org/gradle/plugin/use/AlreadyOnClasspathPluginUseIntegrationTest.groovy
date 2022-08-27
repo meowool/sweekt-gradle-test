@@ -334,6 +334,8 @@ class AlreadyOnClasspathPluginUseIntegrationTest extends AbstractIntegrationSpec
     }
 
     def "cannot request plugin version of plugin from 'buildSrc'"() {
+        // Sweekt: Skip this test because we support it
+        return
 
         given:
         withBinaryPluginBuild("buildSrc")

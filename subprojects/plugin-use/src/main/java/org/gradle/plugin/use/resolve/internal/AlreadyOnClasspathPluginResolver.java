@@ -81,11 +81,7 @@ public class AlreadyOnClasspathPluginResolver implements PluginResolver {
                     );
                 }
             } else {
-                throw new InvalidPluginRequestException(
-                    pluginRequest,
-                    "The request for this plugin could not be satisfied because " +
-                        "the plugin is already on the classpath with an unknown version, so compatibility cannot be checked."
-                );
+                resolveAlreadyOnClasspath(pluginId, null, result);
             }
         } else {
             resolveAlreadyOnClasspath(pluginId, null, result);
