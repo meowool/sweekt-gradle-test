@@ -44,6 +44,7 @@ dependencies {
     implementation(libs.guava)
     implementation(libs.inject)
     implementation(libs.asm)
+    implementation(libs.ciDetect)
 
     implementation(libs.futureKotlin("script-runtime"))
     implementation(libs.futureKotlin("daemon-embeddable"))

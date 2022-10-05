@@ -174,6 +174,7 @@ abstract class ExternalModulesExtension {
     val typesafeConfig = "com.typesafe:config"
     val xerces = "xerces:xercesImpl"
     val xmlunit = "xmlunit:xmlunit"
+    val ciDetect = "be.vbgn.gradle:ci-detect-plugin:0.5.0"
 
     val licenses = mapOf(
         ansiControlSequenceUtil to License.Apache2,

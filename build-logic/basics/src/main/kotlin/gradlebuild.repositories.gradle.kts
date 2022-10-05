@@ -27,6 +27,11 @@ repositories {
             includeModuleByRegex("org.gradle", "docs-asciidoctor-extensions(-base)?")
         }
     }
+    gradlePluginPortal {
+        content {
+            includeModule("be.vbgn.gradle", "ci-detect-plugin")
+        }
+    }
     google {
         content {
             includeGroup("com.android.databinding")
