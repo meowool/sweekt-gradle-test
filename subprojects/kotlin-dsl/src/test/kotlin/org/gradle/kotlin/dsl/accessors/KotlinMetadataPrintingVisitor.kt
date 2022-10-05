@@ -205,6 +205,11 @@ object KotlinMetadataPrintingVisitor {
                     return ForType
                 }
 
+                override fun visitVarargElementType(flags: Flags): KmTypeVisitor? {
+                    println("visitVarargElementType($flags)")
+                    return super.visitVarargElementType(flags)
+                }
+
                 override fun visitEnd() {
                     println("visitEnd()")
                     super.visitEnd()

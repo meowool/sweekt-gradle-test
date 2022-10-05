@@ -75,6 +75,43 @@
 
 
     /**
+     * Adds all dependencies to the 'api' configuration.
+     *
+     * ## Introduction
+     *
+     * The function is a shortcut, and in fact the behavior of the following two code
+     * snippets is the same:
+     *
+     * ```
+     * api("com.example:library:1.0.0")
+     * api("foo.bar:common:0.1.0")
+     * api("a.b:c:0.1.0") {
+     *   isTransitive = true
+     * }
+     * ```
+     *
+     * ```
+     * apiOf(
+     *   "com.example:library:1.0.0",
+     *   "foo.bar:common:0.1.0",
+     *   "a.b:c:0.1.0" config {
+     *     isTransitive = true
+     *   },
+     * )
+     * ```
+     *
+     * @param dependencyNotations notation list for all dependencies to be added.
+     *
+     * @see DependencyHandlerScope.config
+     * @see DependencyHandler.add
+     *
+     * @author chachako
+     */
+    fun DependencyHandler.`apiOf`(vararg dependencyNotations: Any): List<Dependency?> =
+        addAllDependencyNotationsTo(this, "api", dependencyNotations)
+
+
+    /**
      * Adds a dependency to the 'api' configuration.
      *
      * @param dependencyNotation notation for the dependency to be added.
@@ -234,6 +271,44 @@
     @Deprecated(message = "The compile configuration has been deprecated for dependency declaration. Please use the 'api' or 'implementation' configuration instead.")
     fun DependencyHandler.`compile`(dependencyNotation: Any): Dependency? =
         add("compile", dependencyNotation)
+
+
+    /**
+     * Adds all dependencies to the 'compile' configuration.
+     *
+     * ## Introduction
+     *
+     * The function is a shortcut, and in fact the behavior of the following two code
+     * snippets is the same:
+     *
+     * ```
+     * compile("com.example:library:1.0.0")
+     * compile("foo.bar:common:0.1.0")
+     * compile("a.b:c:0.1.0") {
+     *   isTransitive = true
+     * }
+     * ```
+     *
+     * ```
+     * compileOf(
+     *   "com.example:library:1.0.0",
+     *   "foo.bar:common:0.1.0",
+     *   "a.b:c:0.1.0" config {
+     *     isTransitive = true
+     *   },
+     * )
+     * ```
+     *
+     * @param dependencyNotations notation list for all dependencies to be added.
+     *
+     * @see DependencyHandlerScope.config
+     * @see DependencyHandler.add
+     *
+     * @author chachako
+     */
+    @Deprecated(message = "The compile configuration has been deprecated for dependency declaration. Please use the 'api' or 'implementation' configuration instead.")
+    fun DependencyHandler.`compileOf`(vararg dependencyNotations: Any): List<Dependency?> =
+        addAllDependencyNotationsTo(this, "compile", dependencyNotations)
 
 
     /**

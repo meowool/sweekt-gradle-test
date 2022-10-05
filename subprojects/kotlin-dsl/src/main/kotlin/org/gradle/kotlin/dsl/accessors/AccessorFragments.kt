@@ -51,6 +51,10 @@ import org.gradle.kotlin.dsl.support.bytecode.writeFunctionOf
 import org.gradle.kotlin.dsl.support.bytecode.writePropertyOf
 import org.jetbrains.org.objectweb.asm.MethodVisitor
 
+import kotlinx.metadata.Flag
+import kotlinx.metadata.flagsOf
+import org.gradle.api.artifacts.Dependency
+import org.gradle.kotlin.dsl.support.bytecode.publicStaticVarargMethod
 
 internal
 fun fragmentsFor(accessor: Accessor): Fragments = when (accessor) {
@@ -113,6 +117,83 @@ fun fragmentsForConfiguration(accessor: Accessor.ForConfiguration): Fragments = 
                 "(Lorg/gradle/api/artifacts/dsl/DependencyHandler;Ljava/lang/Object;)Lorg/gradle/api/artifacts/Dependency;"
             )
         ),
+
+
+        AccessorFragment(
+            source = name.run {
+                """
+                    /**
+                     * Adds all dependencies to the '$original' configuration.
+                     *
+                     * ## Introduction
+                     *
+                     * The function is a shortcut, and in fact the behavior of the following two code
+                     * snippets is the same:
+                     *
+                     * ```
+                     * $original("com.example:library:1.0.0")
+                     * $original("foo.bar:common:0.1.0")
+                     * $original("a.b:c:0.1.0") {
+                     *   isTransitive = true
+                     * }
+                     * ```
+                     *
+                     * ```
+                     * ${original}Of(
+                     *   "com.example:library:1.0.0",
+                     *   "foo.bar:common:0.1.0",
+                     *   "a.b:c:0.1.0" config {
+                     *     isTransitive = true
+                     *   },
+                     * )
+                     * ```
+                     *
+                     * @param dependencyNotations notation list for all dependencies to be added.
+                     *
+                     * @see DependencyHandlerScope.config
+                     * @see DependencyHandler.add
+                     *
+                     * @author chachako
+                     */$deprecationBlock
+                    fun DependencyHandler.`${kotlinIdentifier}Of`(vararg dependencyNotations: Any): List<Dependency?> =
+                        addAllDependencyNotationsTo(this, "$stringLiteral", dependencyNotations)
+                """
+            },
+            bytecode = {
+                publicStaticMaybeDeprecatedVarargMethod(signature, config) {
+                    ALOAD(0)
+                    LDC(name.original)
+                    ALOAD(1)
+                    invokeRuntime(
+                        "addAllDependencyNotationsTo",
+                        "(L${GradleTypeName.dependencyHandler};Ljava/lang/String;[Ljava/lang/Object;)Ljava/util/List;"
+                    )
+                    ARETURN()
+                }
+            },
+            metadata = {
+                writer.writeFunctionOf(
+                    functionFlags = functionFlags,
+                    receiverType = GradleType.dependencyHandler,
+                    returnType = KotlinType.list<Dependency>(flagsOf(Flag.Type.IS_NULLABLE)),
+                    name = "${propertyName}Of",
+                    parameters = {
+                        visitValueParameter(0, "dependencyNotations")!!.run {
+                            visitType(0).with(KotlinType.vararg(KotlinType.any))
+                            visitVarargElementType(0).with(KotlinType.any)
+                            visitEnd()
+                        }
+                    },
+                    signature = signature
+                )
+            },
+            signature = JvmMethodSignature(
+                "${propertyName}Of",
+                "(Lorg/gradle/api/artifacts/dsl/DependencyHandler;[Ljava/lang/Object;)Ljava/util/List;"
+            )
+        ),
+
+
         AccessorFragment(
             source = name.run {
                 """
@@ -984,5 +1065,27 @@ fun BytecodeFragmentScope.publicStaticMaybeDeprecatedMethod(
         )
     } else {
         publicStaticMethod(jvmMethodSignature, signature, exceptions, false, {}, methodBody)
+    }
+}
+
+
+private
+fun BytecodeFragmentScope.publicStaticMaybeDeprecatedVarargMethod(
+    jvmMethodSignature: JvmMethodSignature,
+    config: ConfigurationEntry<AccessorNameSpec>,
+    signature: String? = null,
+    exceptions: Array<String>? = null,
+    methodBody: MethodVisitor.() -> Unit
+) {
+    if (config.hasDeclarationDeprecations()) {
+        publicStaticVarargMethod(
+            jvmMethodSignature, signature, exceptions, true,
+            {
+                kotlinDeprecation(config.getDeclarationDeprecationMessage())
+            },
+            methodBody
+        )
+    } else {
+        publicStaticVarargMethod(jvmMethodSignature, signature, exceptions, false, {}, methodBody)
     }
 }

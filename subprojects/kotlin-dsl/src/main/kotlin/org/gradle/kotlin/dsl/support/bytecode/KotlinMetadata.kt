@@ -104,6 +104,19 @@ fun ClassVisitor.publicStaticMethod(
 
 
 internal
+fun ClassVisitor.publicStaticVarargMethod(
+    jvmMethodSignature: JvmMethodSignature,
+    signature: String? = null,
+    exceptions: Array<String>? = null,
+    deprecated: Boolean = false,
+    annotations: MethodVisitor.() -> Unit = {},
+    methodBody: MethodVisitor.() -> Unit
+) = jvmMethodSignature.run {
+    publicStaticVarargMethod(name, desc, signature, exceptions, deprecated, annotations, methodBody)
+}
+
+
+internal
 fun ClassVisitor.publicStaticSyntheticMethod(
     signature: JvmMethodSignature,
     methodBody: MethodVisitor.() -> Unit
@@ -248,6 +261,19 @@ inline fun KmTypeVisitor?.with(builder: KmTypeBuilder) {
     }
 }
 
+internal
+fun genericTypeOf(
+    genericType: KmTypeBuilder,
+    genericArgument: KmTypeBuilder,
+    argumentFlags: Flags,
+    argumentVariance: KmVariance,
+): KmTypeBuilder = {
+    genericType()
+    visitArgument(argumentFlags, argumentVariance)!!.run {
+        genericArgument()
+        visitEnd()
+    }
+}
 
 internal
 fun genericTypeOf(genericType: KmTypeBuilder, genericArgument: KmTypeBuilder): KmTypeBuilder = {

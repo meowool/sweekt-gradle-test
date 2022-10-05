@@ -18,9 +18,17 @@ package org.gradle.kotlin.dsl.accessors
 
 import org.gradle.kotlin.dsl.support.bytecode.KmTypeBuilder
 
+import kotlinx.metadata.Flags
+import kotlinx.metadata.KmVariance
+import org.gradle.kotlin.dsl.support.bytecode.genericTypeOf
+
 
 internal
 object KotlinType {
+
+    private val array: KmTypeBuilder = { visitClass("kotlin/Array") }
+
+    private val list: KmTypeBuilder = { visitClass("kotlin/collections/List") }
 
     val string: KmTypeBuilder = { visitClass("kotlin/String") }
 
@@ -29,4 +37,16 @@ object KotlinType {
     val any: KmTypeBuilder = { visitClass("kotlin/Any") }
 
     val typeParameter: KmTypeBuilder = { visitTypeParameter(0) }
+
+    inline fun <reified T> array(
+        argumentFlags: Flags = 0,
+        argumentVariance: KmVariance = KmVariance.INVARIANT
+    ) = genericTypeOf(array, classOf<T>(), argumentFlags, argumentVariance)
+
+    inline fun <reified T> list(
+        argumentFlags: Flags = 0,
+        argumentVariance: KmVariance = KmVariance.INVARIANT
+    ) = genericTypeOf(list, classOf<T>(), argumentFlags, argumentVariance)
+
+    fun vararg(type: KmTypeBuilder, typeFlags: Flags = 0) = genericTypeOf(array, type, typeFlags, KmVariance.OUT)
 }

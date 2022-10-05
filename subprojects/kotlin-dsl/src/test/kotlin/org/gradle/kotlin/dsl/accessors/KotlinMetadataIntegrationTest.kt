@@ -37,6 +37,12 @@ fun <T : Dependency> DependencyHandler.foo(
     action: Action<T>
 ): T = TODO()
 
+/**
+ * This definition is here so its metadata can be inspected.
+ */
+@Suppress("unused_parameter")
+fun DependencyHandler.bar(vararg dependencyNotations: Any): List<Dependency?> = TODO()
+
 
 class KotlinMetadataIntegrationTest : TestWithTempFiles() {
 

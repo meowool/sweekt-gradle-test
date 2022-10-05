@@ -25,6 +25,7 @@ import org.gradle.api.plugins.Convention
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderConvertible
+import org.gradle.kotlin.dsl.*
 
 import org.gradle.kotlin.dsl.support.mapOfNonNullValuesOf
 import org.gradle.kotlin.dsl.support.uncheckedCast
@@ -48,6 +49,38 @@ fun conventionOf(target: Any): Convention = when (target) {
     is Project -> target.convention
     is org.gradle.api.internal.HasConvention -> target.convention
     else -> throw IllegalStateException("Object `$target` doesn't support conventions!")
+}
+
+
+fun addAllDependencyNotationsTo(
+    dependencies: DependencyHandler,
+    configuration: String,
+    dependencyNotations: Array<out Any>
+): List<Dependency?> = dependencyNotations.map {
+    when (it) {
+        is com.meowool.sweekt.gradle.ConfigurableDependency -> when (it.notation) {
+            is String -> addDependencyTo(dependencies, configuration, it.notation) {
+                it.configuration.execute(this)
+            }
+            is org.gradle.api.artifacts.ModuleDependency -> dependencies.add(configuration, it.notation) {
+                it.configuration.execute(this)
+            }
+            is Provider<*> -> {
+                addConfiguredDependencyTo(dependencies, configuration, it.notation) {
+                    it.configuration.execute(this)
+                }
+                null
+            }
+            is ProviderConvertible<*> -> {
+                addConfiguredDependencyTo(dependencies, configuration, it.notation) {
+                    it.configuration.execute(this)
+                }
+                null
+            }
+            else -> throw IllegalArgumentException("Unsupported dependency notation: $it")
+        }
+        else -> dependencies.add(configuration, it)
+    }
 }
 
 
