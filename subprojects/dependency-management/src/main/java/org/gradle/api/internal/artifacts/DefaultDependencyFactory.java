@@ -24,6 +24,7 @@ import org.gradle.api.artifacts.ProjectDependency;
 import org.gradle.api.capabilities.Capability;
 import org.gradle.api.internal.artifacts.dependencies.AbstractModuleDependency;
 import org.gradle.api.internal.artifacts.dependencies.DefaultDependencyConstraint;
+import org.gradle.api.internal.artifacts.dependencies.DefaultExternalModuleDependency;
 import org.gradle.api.internal.artifacts.dsl.dependencies.DependencyFactory;
 import org.gradle.api.internal.artifacts.dsl.dependencies.ModuleFactoryDelegate;
 import org.gradle.api.internal.artifacts.dsl.dependencies.ProjectFinder;
@@ -57,6 +58,17 @@ public class DefaultDependencyFactory implements DependencyFactory {
 
     @Override
     public Dependency createDependency(Object dependencyNotation) {
+        if (dependencyNotation instanceof org.gradle.plugin.use.PluginDependency) {
+            org.gradle.plugin.use.PluginDependency plugin = (org.gradle.plugin.use.PluginDependency) dependencyNotation;
+            // pluginId:pluginId.gradle.plugin:version
+            Dependency dependency = createDependency(new DefaultExternalModuleDependency(
+                DefaultModuleIdentifier.newId(plugin.getPluginId(), plugin.getPluginId() + ".gradle.plugin"),
+                new org.gradle.api.internal.artifacts.dependencies.DefaultMutableVersionConstraint(plugin.getVersion())
+            ));
+            injectServices(dependency);
+            return dependency;
+        }
+
         Dependency dependency = dependencyNotationParser.parseNotation(dependencyNotation);
         injectServices(dependency);
         return dependency;
