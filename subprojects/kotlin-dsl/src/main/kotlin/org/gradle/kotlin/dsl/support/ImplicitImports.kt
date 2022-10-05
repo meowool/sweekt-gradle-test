@@ -47,6 +47,31 @@ class ImplicitImports(
             "java.math.BigDecimal",
             "java.math.BigInteger",
             "java.io.File",
-            "javax.inject.Inject"
+            "javax.inject.Inject",
+
+            // Sweekt
+            "com.meowool.sweekt.*",
+            "com.meowool.sweekt.kotlinpoet.dsl.*",
+
+            "com.meowool.sweekt.gradle.*",
+            "com.meowool.sweekt.gradle.util.*",
+
+            "com.meowool.sweekt.gradle.core.*",
+            "com.meowool.sweekt.gradle.core.compiler.*",
+            "com.meowool.sweekt.gradle.core.configuration.*",
+            "com.meowool.sweekt.gradle.core.plugin.*",
+            "com.meowool.sweekt.gradle.core.util.*",
+
+            "com.meowool.sweekt.gradle.android.*",
+            "com.meowool.sweekt.gradle.android.plugin.*",
+            "com.meowool.sweekt.gradle.android.util.*",
+
+            "com.meowool.sweekt.gradle.multiplatform.*",
+            "com.meowool.sweekt.gradle.multiplatform.common.*",
+            "com.meowool.sweekt.gradle.multiplatform.android.*",
+            "com.meowool.sweekt.gradle.multiplatform.jvm.*",
+            "com.meowool.sweekt.gradle.multiplatform.util.*",
+
+            "com.meowool.sweekt.gradle.publish.*",
         )
 }
