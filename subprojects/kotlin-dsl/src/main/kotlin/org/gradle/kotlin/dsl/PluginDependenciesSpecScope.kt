@@ -43,6 +43,39 @@ class PluginDependenciesSpecScope internal constructor(
 
     override fun alias(notation: ProviderConvertible<PluginDependency>) =
         plugins.alias(notation)
+
+    /**
+     * A shortcut to declare [id].
+     *
+     * ```
+     * plugins {
+     *   +"org.company.myplugin" version "1.3"
+     * }
+     * ```
+     */
+    operator fun String.unaryPlus(): PluginDependencySpec = plugins.id(this)
+
+    /**
+     * A shortcut to declare [alias].
+     *
+     * ```
+     * plugins {
+     *   +libs.plugins.gradleKotlinDsl
+     * }
+     * ```
+     */
+    operator fun Provider<PluginDependency>.unaryPlus(): PluginDependencySpec = plugins.alias(this)
+
+    /**
+     * A shortcut to declare [alias].
+     *
+     * ```
+     * plugins {
+     *   +libs.plugins.gradleKotlinDsl
+     * }
+     * ```
+     */
+    operator fun ProviderConvertible<PluginDependency>.unaryPlus(): PluginDependencySpec = plugins.alias(this)
 }
 
 
