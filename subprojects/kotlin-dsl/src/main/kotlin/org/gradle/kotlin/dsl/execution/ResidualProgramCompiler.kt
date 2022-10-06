@@ -191,8 +191,7 @@ class ResidualProgramCompiler(
         is Instruction.ApplyBasePlugins -> emitApplyBasePluginsTo()
         is Instruction.ApplyDefaultPluginRequests -> emitApplyEmptyPluginRequestsTo()
         is Instruction.ApplyPluginRequestsOf -> {
-            val program = instruction.program
-            when (program) {
+            when (val program = instruction.program) {
                 is Program.Plugins -> emitPrecompiledPluginsBlock(program)
                 is Program.PluginManagement -> emitStage1Sequence(program)
                 is Program.Stage1Sequence -> emitStage1Sequence(program.pluginManagement, program.buildscript, program.plugins)
@@ -586,7 +585,7 @@ class ResidualProgramCompiler(
 
     private
     fun MethodVisitor.emitLoadExtensions() {
-        injectedProperties.forEach { name, type ->
+        injectedProperties.forEach { (name, type) ->
             emitLoadExtension(name, type)
         }
     }

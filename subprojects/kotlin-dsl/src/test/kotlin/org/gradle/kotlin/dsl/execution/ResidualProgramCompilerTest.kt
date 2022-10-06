@@ -400,7 +400,7 @@ class ResidualProgramCompilerTest : TestWithCompiler() {
 
         val buildscript = Program.Buildscript(source.fragment(0..10, 12..45))
         val plugins = Program.Plugins(source.fragment(47..52, 54..84))
-        val stage1 = Program.Stage1Sequence(null, buildscript, plugins)
+        val stage1 = Program.Stage1Sequence(null, buildscript, plugins, null)
         val stage2 = source.map { it.without(buildscript, plugins) }
         val stagedProgram =
             Dynamic(
@@ -451,7 +451,7 @@ class ResidualProgramCompilerTest : TestWithCompiler() {
         )
         val pluginManagement = Program.PluginManagement(source.fragment(0..15, 17..55))
         val plugins = Program.Plugins(source.fragment(57..62, 64..94))
-        val stage1 = Program.Stage1Sequence(pluginManagement, null, plugins)
+        val stage1 = Program.Stage1Sequence(pluginManagement, null, plugins, null)
 
         // When
         val stagedProgram =

@@ -58,14 +58,24 @@ sealed class Program {
      */
     data class Plugins(override val fragment: ProgramSourceFragment) : Stage1(), FragmentHolder
 
+    /**
+     * Some codes that need to be evaluated at the stage 1.
+     *
+     * @author chachako
+     */
+    data class PrecompileCodes(val codes: Map<String, String>) : Stage1()
+
     interface FragmentHolder {
         val fragment: ProgramSourceFragment
     }
 
     /**
-     * An optional `pluginManagement` block followed by a `buildscript` block then followed by a `plugins` block.
+     * An optional `pluginManagement` block followed by a `buildscript` block then followed by a `plugins` block,
+     * and then contains some source code that needs to be compiled in advance.
+     *
+     * @author chachako
      */
-    data class Stage1Sequence(val pluginManagement: PluginManagement?, val buildscript: Buildscript?, val plugins: Plugins?) : Stage1()
+    data class Stage1Sequence(val pluginManagement: PluginManagement?, val buildscript: Buildscript?, val plugins: Plugins?, val precompile: PrecompileCodes?) : Stage1()
 
     /**
      * A script that must be dynamically evaluated after stage 1 completes and the script classpath

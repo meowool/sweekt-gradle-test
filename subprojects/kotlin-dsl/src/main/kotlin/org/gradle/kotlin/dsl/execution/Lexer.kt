@@ -21,8 +21,10 @@ import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.lexer.KtTokens.COMMENTS
 import org.jetbrains.kotlin.lexer.KtTokens.IDENTIFIER
 import org.jetbrains.kotlin.lexer.KtTokens.LBRACE
+import org.jetbrains.kotlin.lexer.KtTokens.LPAR
 import org.jetbrains.kotlin.lexer.KtTokens.PACKAGE_KEYWORD
 import org.jetbrains.kotlin.lexer.KtTokens.RBRACE
+import org.jetbrains.kotlin.lexer.KtTokens.RPAR
 import org.jetbrains.kotlin.lexer.KtTokens.WHITE_SPACE
 
 
@@ -137,10 +139,14 @@ fun lex(script: String, vararg topLevelBlockIds: TopLevelBlockId): Packaged<Lexe
 
                             when (tokenType) {
                                 IDENTIFIER -> if (!matchTopLevelIdentifier()) reset()
-                                LBRACE -> {
-                                    depth += 1
-                                    state = State.SearchingBlockEnd
-                                    blockStart = tokenStart
+                                LBRACE, LPAR -> {
+                                    if (tokenType == LPAR && inTopLevelBlock?.parentheses != true) {
+                                        reset()
+                                    } else {
+                                        depth += 1
+                                        blockStart = tokenStart
+                                        state = State.SearchingBlockEnd
+                                    }
                                 }
                                 else -> reset()
                             }
@@ -149,8 +155,8 @@ fun lex(script: String, vararg topLevelBlockIds: TopLevelBlockId): Packaged<Lexe
                         State.SearchingBlockEnd -> {
 
                             when (tokenType) {
-                                LBRACE -> depth += 1
-                                RBRACE -> {
+                                LBRACE, LPAR -> depth += 1
+                                RBRACE, RPAR -> {
                                     depth -= 1
                                     if (depth == 0) {
                                         topLevelBlocks.add(
@@ -220,11 +226,23 @@ data class TopLevelBlock(val identifier: TopLevelBlockId, val section: ScriptSec
 
 @Suppress("EnumEntryName")
 internal
-enum class TopLevelBlockId {
+enum class TopLevelBlockId(val parentheses: Boolean = false, val precompile: Boolean = false) {
     buildscript,
     plugins,
     pluginManagement,
-    initscript;
+    initscript,
+    allprojects,
+
+    // Sweekt
+    applyKotlinDsl(true, true),
+    kotlinJvm(true, true),
+    kotlinMultiplatform(true, true),
+    kotlinSamWithReceiver(true, true),
+    commonPlatform(true, true),
+    androidPlatform(true, true),
+    jvmPlatform(true, true),
+    androidApp(true, true),
+    androidLib(true, true);
 
     val tokenText: String
         get() = name
@@ -232,7 +250,13 @@ enum class TopLevelBlockId {
     companion object {
 
         fun topLevelBlockIdFor(target: ProgramTarget) = when (target) {
-            ProgramTarget.Project -> arrayOf(buildscript, plugins)
+            ProgramTarget.Project -> arrayOf(
+                buildscript, plugins, allprojects,
+                // Sweekt
+                applyKotlinDsl, kotlinJvm, kotlinMultiplatform, kotlinSamWithReceiver,
+                commonPlatform, androidPlatform, jvmPlatform,
+                androidApp, androidLib
+            )
             ProgramTarget.Settings -> arrayOf(buildscript, pluginManagement, plugins)
             ProgramTarget.Gradle -> arrayOf(initscript)
         }

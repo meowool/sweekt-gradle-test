@@ -34,6 +34,7 @@ object ProgramParser {
     fun programFor(source: ProgramSource, kind: ProgramKind, target: ProgramTarget): Packaged<Program> {
 
         val topLevelBlockIds = TopLevelBlockId.topLevelBlockIdFor(target)
+        val precompileBlockIds = TopLevelBlockId.values().filter { it.precompile }.toTypedArray()
 
         return lex(source.text, *topLevelBlockIds).map { (comments, topLevelBlocks) ->
 
@@ -44,50 +45,66 @@ object ProgramParser {
             val sourceWithoutComments =
                 source.map { it.erase(comments) }
 
-            val buildscriptFragment =
-                topLevelBlocks
-                    .singleSectionOf(TopLevelBlockId.buildscriptIdFor(target))
-                    ?.let { sourceWithoutComments.fragment(it) }
+            fun sectionOf(topLevelBlockId: TopLevelBlockId, expectedKind: ProgramKind? = null): ScriptSection? {
+                if (!topLevelBlockIds.contains(topLevelBlockId) || (expectedKind != null && expectedKind != kind)) return null
+                return topLevelBlocks.singleSectionOf(topLevelBlockId)
+            }
 
-            val pluginManagementFragment =
-                topLevelBlocks
-                    .singleSectionOf(TopLevelBlockId.pluginManagement)
-                    ?.let { sourceWithoutComments.fragment(it) }
+            fun fragmentOf(topLevelBlockId: TopLevelBlockId, expectedKind: ProgramKind? = null): ProgramSourceFragment? =
+                sectionOf(topLevelBlockId, expectedKind)?.let { sourceWithoutComments.fragment(it) }
 
-            val pluginsFragment =
-                topLevelBlocks
-                    .takeIf { topLevelBlockIds.contains(TopLevelBlockId.plugins) && kind == ProgramKind.TopLevel }
-                    ?.singleSectionOf(TopLevelBlockId.plugins)
-                    ?.let { sourceWithoutComments.fragment(it) }
+            fun precompileCodes(topLevelBlocks: List<TopLevelBlock>) = precompileBlockIds
+                .filter { id -> id in topLevelBlockIds && topLevelBlocks.any { it.identifier == id } }
+                .associate { it.name to "${it.name}()" } // name()
 
-            val buildscript =
-                buildscriptFragment?.takeIf { it.isNotBlank() }?.let(Program::Buildscript)
+            val buildscriptFragment = fragmentOf(TopLevelBlockId.buildscriptIdFor(target))
+            val pluginManagementFragment = fragmentOf(TopLevelBlockId.pluginManagement)
+            val pluginsFragment = fragmentOf(TopLevelBlockId.plugins)
 
-            val pluginManagement =
-                pluginManagementFragment?.takeIf { it.isNotBlank() }?.let(Program::PluginManagement)
+            // Sweekt
+            val allprojects = sectionOf(TopLevelBlockId.allprojects)?.block?.let {
+                val blockRange = it.first.plus(1)..it.last.minus(1)
+                val blockContent = sourceWithoutComments.contents.preserve(blockRange).text
+                // We only need the code from the "allprojects" block
+                lex(blockContent, *precompileBlockIds).map { (_, topLevelBlocks) ->
+                    precompileCodes(topLevelBlocks)
+                }.document
+            }
+            val precompileCodes = allprojects.orEmpty() + precompileCodes(topLevelBlocks)
 
-            val plugins =
-                pluginsFragment?.takeIf { it.isNotBlank() }?.let(Program::Plugins)
+            val buildscript = buildscriptFragment
+                ?.takeIf { it.isNotBlank() }
+                ?.let(Program::Buildscript)
 
-            val stage1Components =
-                listOfNotNull<Program.Stage1>(pluginManagement, buildscript, plugins)
+            val pluginManagement = pluginManagementFragment
+                ?.takeIf { it.isNotBlank() }
+                ?.let(Program::PluginManagement)
+
+            val plugins = pluginsFragment
+                ?.takeIf { it.isNotBlank() }
+                ?.let(Program::Plugins)
+
+            val precompile = precompileCodes
+                .takeIf { it.isNotEmpty() }
+                ?.let(Program::PrecompileCodes)
+
+            val stage1Components = listOfNotNull(pluginManagement, buildscript, plugins, precompile)
 
             val stage1 = when {
                 stage1Components.isEmpty() -> null
                 stage1Components.size == 1 -> stage1Components.first()
-                else -> Program.Stage1Sequence(pluginManagement, buildscript, plugins)
+                else -> Program.Stage1Sequence(pluginManagement, buildscript, plugins, precompile)
             }
 
-            val remainingSource =
-                sourceWithoutComments.map {
-                    it.erase(
-                        listOfNotNull(
-                            buildscriptFragment?.range,
-                            pluginManagementFragment?.range,
-                            pluginsFragment?.range
-                        )
+            val remainingSource = sourceWithoutComments.map { text ->
+                text.erase(
+                    listOfNotNull(
+                        buildscriptFragment?.range,
+                        pluginManagementFragment?.range,
+                        pluginsFragment?.range
                     )
-                }
+                )
+            }
 
             val stage2 = remainingSource
                 .takeIf { it.text.isNotBlank() }

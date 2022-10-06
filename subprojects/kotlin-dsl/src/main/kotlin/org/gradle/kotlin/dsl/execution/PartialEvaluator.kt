@@ -58,6 +58,8 @@ class PartialEvaluator(
 
         is Program.Plugins -> stage1WithPlugins(program)
 
+        is Program.PrecompileCodes -> stage1WithPrecompile(program)
+
         is Program.Stage1Sequence -> stage1WithPlugins(program)
 
         is Program.Script -> reduceScriptProgram(program)
@@ -176,22 +178,22 @@ class PartialEvaluator(
                 else -> reduceBuildscriptProgram(stage1)
             }
 
+        is Program.PrecompileCodes -> stage1WithPrecompile(stage1)
+
         else -> stage1WithPlugins(stage1)
     }
 
     private
-    fun stage1WithPlugins(stage1: Program.Stage1): Static =
-        when (programTarget) {
-            ProgramTarget.Project -> Static(
-                SetupEmbeddedKotlin,
-                ApplyPluginRequestsOf(stage1),
-                ApplyBasePlugins
-            )
-            else -> Static(
-                SetupEmbeddedKotlin,
-                ApplyPluginRequestsOf(stage1)
-            )
+    fun stage1WithPlugins(stage1: Program.Stage1): Static {
+        val instructions = mutableListOf(SetupEmbeddedKotlin, ApplyPluginRequestsOf(stage1))
+        if (programTarget == ProgramTarget.Project) {
+            instructions += ApplyBasePlugins
         }
+        if (stage1 is Program.Stage1Sequence) {
+            stage1.precompile?.toInstruction()?.let(instructions::addAll)
+        }
+        return Static(instructions)
+    }
 
     private
     fun stage1WithPluginManagement(program: Program.PluginManagement): Static {
@@ -200,5 +202,19 @@ class PartialEvaluator(
             Eval(fragmentHolderSourceFor(program)),
             ApplyDefaultPluginRequests
         )
+    }
+
+    private
+    fun stage1WithPrecompile(codes: Program.PrecompileCodes): Static {
+        val instructions = mutableListOf(SetupEmbeddedKotlin, ApplyDefaultPluginRequests)
+        if (programTarget == ProgramTarget.Project) {
+            instructions += ApplyBasePlugins
+        }
+        instructions += codes.toInstruction()
+        return Static(instructions)
+    }
+
+    private fun Program.PrecompileCodes.toInstruction() = codes.map { (name, code) ->
+        Eval(ProgramSource("Precompiled_$name.kts", code))
     }
 }

@@ -134,6 +134,35 @@ class PartialEvaluatorTest {
     }
 
     @Test
+    fun `a top-level Project precompile codes`() {
+
+        val program = listOf(
+            TopLevelBlockId.androidApp,
+            TopLevelBlockId.kotlinJvm,
+            TopLevelBlockId.applyKotlinDsl,
+        ).associate { it.name to "${it.name}()" }.let(Program::PrecompileCodes)
+
+        assertThat(
+            "reduces to static program that applies plugin requests and base plugins",
+            partialEvaluationOf(
+                program,
+                ProgramKind.TopLevel,
+                ProgramTarget.Project
+            ),
+            isResidualProgram(
+                Static(
+                    SetupEmbeddedKotlin,
+                    ApplyDefaultPluginRequests,
+                    ApplyBasePlugins,
+                    Eval(ProgramSource("Precompiled_androidApp.kts", "androidApp()")),
+                    Eval(ProgramSource("Precompiled_kotlinJvm.kts", "kotlinJvm()")),
+                    Eval(ProgramSource("Precompiled_applyKotlinDsl.kts", "applyKotlinDsl()"))
+                )
+            )
+        )
+    }
+
+    @Test
     fun `a top-level Settings plugins block`() {
 
         val program =
@@ -185,7 +214,8 @@ class PartialEvaluatorTest {
             Program.Stage1Sequence(
                 null,
                 Program.Buildscript(fragment("buildscript", "...")),
-                Program.Plugins(fragment("plugins", "..."))
+                Program.Plugins(fragment("plugins", "...")),
+                null
             )
 
         assertThat(
@@ -212,7 +242,8 @@ class PartialEvaluatorTest {
             Program.Stage1Sequence(
                 null,
                 Program.Buildscript(fragment("buildscript", "...")),
-                Program.Plugins(fragment("plugins", "..."))
+                Program.Plugins(fragment("plugins", "...")),
+                null
             )
 
         assertThat(
@@ -239,7 +270,8 @@ class PartialEvaluatorTest {
                 Program.Stage1Sequence(
                     null,
                     Program.Buildscript(fragment("buildscript", "...")),
-                    Program.Plugins(fragment("plugins", "..."))
+                    Program.Plugins(fragment("plugins", "...")),
+                    null
                 ),
                 Program.Script(ProgramSource("script.gradle.kts", "..."))
             )

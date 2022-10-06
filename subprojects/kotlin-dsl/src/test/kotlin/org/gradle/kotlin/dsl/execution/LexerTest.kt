@@ -18,6 +18,8 @@ package org.gradle.kotlin.dsl.execution
 
 import org.gradle.kotlin.dsl.execution.TopLevelBlockId.buildscript
 import org.gradle.kotlin.dsl.execution.TopLevelBlockId.plugins
+import org.gradle.kotlin.dsl.execution.TopLevelBlockId.kotlinJvm
+import org.gradle.kotlin.dsl.execution.TopLevelBlockId.applyKotlinDsl
 
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.MatcherAssert.assertThat
@@ -40,8 +42,12 @@ class LexerTest {
                     "\nplugins { /*" +
                     "\n ... */" +
                     "\n}" +
+                    "\nkotlinJvm { /*" +
+                    "\n ... */" +
+                    "\n}" +
+                    "\napplyKotlinDsl(/* ... */)" +
                     "\n// ...",
-                buildscript, plugins
+                buildscript, plugins, kotlinJvm, applyKotlinDsl
             ),
             equalTo(
                 Packaged(
@@ -52,11 +58,15 @@ class LexerTest {
                             10..15,
                             31..40,
                             54..63,
-                            67..72
+                            79..88,
+                            107..115,
+                            118..123,
                         ),
                         listOf(
                             topLevelBlock(buildscript, 17..27, 29..42),
-                            topLevelBlock(plugins, 44..50, 52..65)
+                            topLevelBlock(plugins, 44..50, 52..65),
+                            topLevelBlock(kotlinJvm, 67..75, 77..90),
+                            topLevelBlock(applyKotlinDsl, 92..105, 106..116),
                         )
                     )
                 )

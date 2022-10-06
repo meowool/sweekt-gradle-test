@@ -119,7 +119,8 @@ class ProgramParserTest {
                 Program.Stage1Sequence(
                     null,
                     Program.Buildscript(source.fragment(0..10, 12..45)),
-                    Program.Plugins(source.fragment(47..53, 55..84))
+                    Program.Plugins(source.fragment(47..53, 55..84)),
+                    null
                 ),
                 Program.Script(source.map { text(expectedScript) })
             )
@@ -182,7 +183,8 @@ class ProgramParserTest {
                 Program.Stage1Sequence(
                     Program.PluginManagement(source.fragment(0..15, 17..55)),
                     Program.Buildscript(source.fragment(57..67, 69..102)),
-                    Program.Plugins(source.fragment(104..110, 112..141))
+                    Program.Plugins(source.fragment(104..110, 112..141)),
+                    null
                 ),
                 Program.Script(source.map { text(expectedScript) })
             ),
@@ -231,7 +233,8 @@ class ProgramParserTest {
                 Program.Stage1Sequence(
                     null,
                     Program.Buildscript(source.fragment(79..89, 91..207)),
-                    Program.Plugins(source.fragment(13..19, 21..64))
+                    Program.Plugins(source.fragment(13..19, 21..64)),
+                    null
                 ),
                 Program.Script(expectedScriptSource)
             )
