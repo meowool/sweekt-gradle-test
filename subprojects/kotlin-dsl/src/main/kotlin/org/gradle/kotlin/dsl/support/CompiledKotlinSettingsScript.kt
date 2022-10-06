@@ -24,6 +24,7 @@ import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
 import org.gradle.api.logging.LoggingManager
 import org.gradle.api.plugins.PluginAware
+import org.gradle.kotlin.dsl.*
 
 
 @ImplicitReceiver(Settings::class)
@@ -36,6 +37,14 @@ open class CompiledKotlinSettingsScript(
      */
     val buildscript: ScriptHandler
         get() = host.scriptHandler
+
+    /**
+     * Configures plugin management for this script.
+     *
+     * @see [Settings.pluginManagement]
+     */
+    open fun pluginManagement(block: PluginManagementSpecScope.() -> Unit): Unit =
+        host.target.pluginManagement { PluginManagementSpecScope(this).block() }
 
     private
     class SettingsScriptHost(val host: KotlinScriptHost<Settings>) : Host {
