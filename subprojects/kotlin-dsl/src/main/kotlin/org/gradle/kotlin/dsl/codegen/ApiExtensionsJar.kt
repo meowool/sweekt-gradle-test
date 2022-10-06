@@ -22,6 +22,7 @@ import org.gradle.kotlin.dsl.support.zipTo
 
 import com.google.common.annotations.VisibleForTesting
 import org.gradle.api.internal.file.temp.TemporaryFileProvider
+import org.jetbrains.kotlin.config.JvmTarget
 
 import java.io.File
 
@@ -119,7 +120,8 @@ fun compileKotlinApiExtensionsTo(
         "gradle-api-extensions",
         sourceFiles,
         logger,
-        classPath = classPath
+        classPath = classPath,
+        jvmTarget = JvmTarget.JVM_1_8
     )
 
     if (!success) {

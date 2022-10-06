@@ -51,7 +51,7 @@ import org.jetbrains.kotlin.config.JVMConfigurationKeys.OUTPUT_DIRECTORY
 import org.jetbrains.kotlin.config.JVMConfigurationKeys.RETAIN_OUTPUT_IN_MEMORY
 import org.jetbrains.kotlin.config.JvmAnalysisFlags
 import org.jetbrains.kotlin.config.JvmDefaultMode
-import org.jetbrains.kotlin.config.JvmTarget.JVM_1_8
+import org.jetbrains.kotlin.config.JvmTarget
 import org.jetbrains.kotlin.config.LanguageFeature
 import org.jetbrains.kotlin.config.LanguageVersion
 import org.jetbrains.kotlin.config.LanguageVersionSettingsImpl
@@ -209,12 +209,13 @@ fun compileToDirectory(
     moduleName: String,
     sourceFiles: Iterable<File>,
     logger: Logger,
-    classPath: Iterable<File>
+    classPath: Iterable<File>,
+    jvmTarget: JvmTarget = JvmTarget.JVM_11
 ): Boolean {
 
     withRootDisposable {
         withMessageCollectorFor(logger) { messageCollector ->
-            val configuration = compilerConfigurationFor(messageCollector).apply {
+            val configuration = compilerConfigurationFor(messageCollector, jvmTarget).apply {
                 addKotlinSourceRoots(sourceFiles.map { it.canonicalPath })
                 put(OUTPUT_DIRECTORY, outputDirectory)
                 setModuleName(moduleName)
@@ -338,10 +339,10 @@ class LoggingOutputStream(val log: (String) -> Unit) : OutputStream() {
 
 
 private
-fun compilerConfigurationFor(messageCollector: MessageCollector): CompilerConfiguration =
+fun compilerConfigurationFor(messageCollector: MessageCollector, jvmTarget: JvmTarget = JvmTarget.JVM_11): CompilerConfiguration =
     CompilerConfiguration().apply {
         put(CLIConfigurationKeys.MESSAGE_COLLECTOR_KEY, messageCollector)
-        put(JVM_TARGET, JVM_1_8)
+        put(JVM_TARGET, jvmTarget)
         put(CommonConfigurationKeys.LANGUAGE_VERSION_SETTINGS, gradleKotlinDslLanguageVersionSettings)
     }
 
