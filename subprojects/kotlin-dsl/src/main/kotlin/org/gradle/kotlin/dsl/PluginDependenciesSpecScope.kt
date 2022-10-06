@@ -27,12 +27,10 @@ import org.gradle.plugin.use.PluginDependencySpec
 /**
  * Receiver for the `plugins` block.
  *
- * This class exists for the sole purpose of marking the `plugins` block as a [GradleDsl] thus
- * hiding all members provided by the outer [KotlinBuildScript] scope.
- *
  * @see [PluginDependenciesSpec]
+ *
+ * @author chachako
  */
-@GradleDsl
 class PluginDependenciesSpecScope internal constructor(
     private val plugins: PluginDependenciesSpec
 ) : PluginDependenciesSpec {
