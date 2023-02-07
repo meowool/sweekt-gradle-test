@@ -1,0 +1,16 @@
+name: Release sweekt distribution
+
+on:
+  push:
+    branches: ['**/*']
+
+jobs:
+  release:
+    if: "startsWith(github.event.head_commit.message, 'release: ')"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/workflows/bot
+        env:
+          RUN_TYPE: Release
+          GITHUB_CLIENT_TOKEN: ${{ secrets.BOT_TOKEN }}
