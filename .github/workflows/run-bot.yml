@@ -1,0 +1,17 @@
+name: Run sweekt-gradle bot
+
+on:
+  push:
+    branches: ['**/*']
+  release:
+    types: [released, edited]
+  workflow_dispatch:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/workflows/bot
+        env:
+          GITHUB_CLIENT_TOKEN: ${{ secrets.BOT_TOKEN }}
