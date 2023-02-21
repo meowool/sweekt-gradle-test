@@ -58,8 +58,11 @@ class BotIssueBodyTemplate(val context: Context) {
       appendLine().appendLine(error.log)
       appendLine("```")
     }
-    is Throwable -> error.stackTraceToString()
-    else -> error.toString()
+    else -> buildString {
+      appendLine("```")
+      appendLine((error as? Throwable)?.stackTraceToString() ?: error)
+      appendLine("```")
+    }
   }
 
   companion object {

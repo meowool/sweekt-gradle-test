@@ -56,9 +56,9 @@ class ReleaseDistributionJob(
   ) = runCatching {
     gradle.disableVerification {
       gradle.clean()
-      bot.defaultChangedModules().also { modules ->
-        retry("testing '$modules' modules", max = 3) {
-          gradle(*modules.map { ":$it:quickTest" }.toTypedArray())
+      bot.defaultChangedModules().forEach { module ->
+        retry("testing '$module' module", max = 2) {
+          gradle(":$module:quickTest")
         }
       }
     }
