@@ -29,6 +29,7 @@ class GradleService(private val git: GitService) {
       PropertiesFile.writeFile(
         fileContent.lines().filterNot {
           it.startsWith("org.gradle.jvmargs") ||
+            it.startsWith("org.gradle.parallel") ||
             it.startsWith("org.gradle.unsafe.configuration-cache")
         }.joinToString(
           separator = "\n",
@@ -39,9 +40,10 @@ class GradleService(private val git: GitService) {
         ExecutableFile,
         *args,
         *properties.map { "-P$it" }.toTypedArray(),
+        "--no-parallel",
+        "--no-configuration-cache",
         "-Dfile.encoding=UTF-8",
         "-Duser.language=en",
-        "--no-configuration-cache",
       )
     }
     return output!!

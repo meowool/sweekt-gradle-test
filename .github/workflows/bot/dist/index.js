@@ -556,8 +556,8 @@ class OidcClient {
             const res = yield httpclient
                 .getJson(id_token_url)
                 .catch(error => {
-                throw new Error(`Failed to get ID Token. \n 
-        Error Code : ${error.statusCode}\n 
+                throw new Error(`Failed to get ID Token. \n
+        Error Code : ${error.statusCode}\n
         Error Message: ${error.result.message}`);
             });
             const id_token = (_a = res.result) === null || _a === void 0 ? void 0 : _a.value;
@@ -27837,7 +27837,13 @@ try {
             while (tmp0_iterator.l()) {
               var element = tmp0_iterator.e();
               var tmp_1;
+              var tmp_2;
               if (startsWith$default(element, 'org.gradle.jvmargs', false, 2, null)) {
+                tmp_2 = true;
+              } else {
+                tmp_2 = startsWith$default(element, 'org.gradle.parallel', false, 2, null);
+              }
+              if (tmp_2) {
                 tmp_1 = true;
               } else {
                 tmp_1 = startsWith$default(element, 'org.gradle.unsafe.configuration-cache', false, 2, null);
@@ -27867,16 +27873,16 @@ try {
             }
 
             var tmp1_toTypedArray = tmp0_mapTo;
-            suspendResult = exec_0('./gradlew', arrayConcat([this.o6c_1, copyToArray(tmp1_toTypedArray), ['-Dfile.encoding=UTF-8', '-Duser.language=en', '--no-configuration-cache']]), this);
+            suspendResult = exec_0('./gradlew', arrayConcat([this.o6c_1, copyToArray(tmp1_toTypedArray), ['--no-parallel', '--no-configuration-cache', '-Dfile.encoding=UTF-8', '-Duser.language=en']]), this);
             if (suspendResult === get_COROUTINE_SUSPENDED()) {
               return suspendResult;
             }
 
             continue $sm;
           case 5:
-            var tmp_2 = this;
+            var tmp_3 = this;
             this.q6c_1 = suspendResult;
-            tmp_2.u6c_1 = Unit_getInstance();
+            tmp_3.u6c_1 = Unit_getInstance();
             this.oi_1 = 15;
             this.ni_1 = 6;
             continue $sm;
@@ -30575,12 +30581,6 @@ if (typeof Math.clz32 === 'undefined') {
     };
   }(Math.log, Math.LN2);
 }
-if (typeof String.prototype.startsWith === 'undefined') {
-  Object.defineProperty(String.prototype, 'startsWith', {value: function (searchString, position) {
-    position = position || 0;
-    return this.lastIndexOf(searchString, position) === position;
-  }});
-}
 if (typeof String.prototype.endsWith === 'undefined') {
   Object.defineProperty(String.prototype, 'endsWith', {value: function (searchString, position) {
     var subjectString = this.toString();
@@ -30590,6 +30590,12 @@ if (typeof String.prototype.endsWith === 'undefined') {
     position -= searchString.length;
     var lastIndex = subjectString.indexOf(searchString, position);
     return lastIndex !== -1 && lastIndex === position;
+  }});
+}
+if (typeof String.prototype.startsWith === 'undefined') {
+  Object.defineProperty(String.prototype, 'startsWith', {value: function (searchString, position) {
+    position = position || 0;
+    return this.lastIndexOf(searchString, position) === position;
   }});
 }
 if (typeof Math.imul === 'undefined') {
@@ -90898,7 +90904,7 @@ module.exports = JSON.parse('[[[0,44],"disallowed_STD3_valid"],[[45,46],"valid"]
 /************************************************************************/
 /******/ 	// The module cache
 /******/ 	var __webpack_module_cache__ = {};
-/******/ 	
+/******/
 /******/ 	// The require function
 /******/ 	function __nccwpck_require__(moduleId) {
 /******/ 		// Check if module is in cache
@@ -90912,7 +90918,7 @@ module.exports = JSON.parse('[[[0,44],"disallowed_STD3_valid"],[[45,46],"valid"]
 /******/ 			// no module.loaded needed
 /******/ 			exports: {}
 /******/ 		};
-/******/ 	
+/******/
 /******/ 		// Execute the module function
 /******/ 		var threw = true;
 /******/ 		try {
@@ -90921,23 +90927,23 @@ module.exports = JSON.parse('[[[0,44],"disallowed_STD3_valid"],[[45,46],"valid"]
 /******/ 		} finally {
 /******/ 			if(threw) delete __webpack_module_cache__[moduleId];
 /******/ 		}
-/******/ 	
+/******/
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
 /******/ 	}
-/******/ 	
+/******/
 /************************************************************************/
 /******/ 	/* webpack/runtime/compat */
-/******/ 	
+/******/
 /******/ 	if (typeof __nccwpck_require__ !== 'undefined') __nccwpck_require__.ab = __dirname + "/";
-/******/ 	
+/******/
 /************************************************************************/
-/******/ 	
+/******/
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
 /******/ 	var __webpack_exports__ = __nccwpck_require__(7207);
 /******/ 	module.exports = __webpack_exports__;
-/******/ 	
+/******/
 /******/ })()
 ;
