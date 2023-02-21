@@ -1,12 +1,13 @@
 name: Release sweekt distribution
 
 on:
+  workflow_dispatch:
   push:
     branches: ['**/*']
 
 jobs:
   release:
-    if: "startsWith(github.event.head_commit.message, 'release: ')"
+    if: "github.event_name == 'workflow_dispatch' || startsWith(github.event.head_commit.message, 'release: ')"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
