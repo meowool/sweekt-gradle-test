@@ -54,10 +54,10 @@ class ReleaseDistributionJob(
     version: GradleVersion,
     latestRelease: GithubRelease,
   ) = runCatching {
-    gradle.disableVerification {
-      gradle.clean()
-      bot.defaultChangedModules().forEach { module ->
-        retry("testing '$module' module", max = 2) {
+    bot.defaultChangedModules().forEach { module ->
+      retry("testing '$module' module", max = 2) {
+        gradle.disableVerification {
+          gradle("clean")
           gradle(":$module:quickTest")
         }
       }
